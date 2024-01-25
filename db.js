@@ -21,8 +21,4 @@ async function Sync() {
     await sequelize.sync({alter:true})
 }
 
-async function Sync() {
-    await sequelize.sync({alter:true})
-}
-
 module.exports = { db, Sync };

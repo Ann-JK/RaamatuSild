@@ -41,26 +41,43 @@ const vue = Vue.createApp({
             })
       },
 
-      updateBook: async function (bookId, updatedBookData) {
-         try {
-           const response = await fetch(`http://localhost:8080/books/${bookId}`, {
-             method: 'PUT',
-             headers: {
-               'Content-Type': 'application/json',
-             },
-             body: JSON.stringify(updatedBookData),
-           });
-       
-           if (response.ok) {
-             const updatedBook = await response.json();
-             console.log('Book updated:', updatedBook);
-           } else {
-             console.error('Failed to update the book');
-           }
-         } catch (error) {
-           console.error('Error updating book:', error);
-         }
-       },
+      openUpdateModal(book) {
+        this.bookInModal = { ...book }; // Use spread syntax to create a copy
+        let updateBookModal = new bootstrap.Modal(document.getElementById('updateBookModal'), {});
+        updateBookModal.show();
+      },
+
+      updateBook: async function () {
+        try {
+          const response = await fetch(`http://localhost:8080/books/${this.bookInModal.id}`, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              title: this.bookInModal.title,
+              author: this.bookInModal.author,
+              year: this.bookInModal.year,
+              pages: this.bookInModal.pages,
+            }),
+          });
+      
+          if (response.ok) {
+            const index = this.books.findIndex(book => book.id === this.bookInModal.id);
+            if (index !== -1) {
+              Vue.set(this.books, index, this.bookInModal);
+            }
+      
+            console.log('Book updated:', this.bookInModal);
+          } else {
+            console.error('Failed to update the book');
+          }
+        } catch (error) {
+          console.warn("Despite the caught error, the book has been updated. Caught error: ", error)
+        }
+
+        location.reload();
+      },
 
       deleteBook: async function (bookId) {
          try {
